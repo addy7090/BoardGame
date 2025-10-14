@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>보드게임카페 • 규칙 모음</title>
+  <meta name="description" content="달무티, 범인은 춤춘다, 카멜레온, 스파이폴, 쿠키런 러브레터 규칙 모음" />
+  <style>
+    :root{ --bg:#0b0c10; --card:#111218; --muted:#8b8fa3; --text:#eef0f7; --brand:#7c9cff; --accent:#9ef0c3; --ring:0 0 0 3px rgba(124,156,255,.35); }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Pretendard,Apple SD Gothic Neo,Noto Sans KR,Helvetica,Arial; background:linear-gradient(180deg,#0b0c10 0%,#0e1018 60%,#0b0c10 100%); color:var(--text)}
+    a{color:inherit}
+    .container{max-width:1100px;margin:0 auto;padding:24px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--brand),var(--accent));box-shadow:0 10px 30px rgba(124,156,255,.35)}
+    h1{font-size:22px;margin:0}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap}
+    .select{appearance:none;background:var(--card);border:1px solid #1c2030;color:var(--text);padding:12px 38px 12px 14px;border-radius:12px;position:relative}
+    .btn{background:var(--brand);color:#0b0c10;border:none;padding:12px 16px;border-radius:12px;font-weight:700;cursor:pointer}
+    .btn:focus{box-shadow:var(--ring)}
+
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+    .card{grid-column:span 12;background:linear-gradient(180deg,#111218,#0e1118);border:1px solid #1c2030;border-radius:18px;padding:16px;position:relative;overflow:hidden}
+    @media(min-width:700px){.card{grid-column:span 6}}
+    @media(min-width:1000px){.card{grid-column:span 4}}
+    .card:hover{transform:translateY(-2px);transition:transform .2s ease}
+    .badge{position:absolute;top:12px;right:12px;background:#0f1320;border:1px solid #232a46;color:var(--muted);padding:6px 10px;border-radius:999px;font-size:12px}
+    .card h3{margin:8px 0 4px;font-size:18px}
+    .meta{display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:13px}
+    .card p{color:#cfd5ea;font-size:14px;line-height:1.4}
+    .actions{margin-top:10px;display:flex;gap:10px}
+    .ghost{background:#111826;border:1px solid #25304d;color:#d8def4}
+
+    dialog{width:min(860px,92vw);border:none;border-radius:18px;background:#0e1118;color:var(--text);padding:0;box-shadow:0 25px 80px rgba(0,0,0,.6)}
+    .sheet-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid #1c2030}
+    .sheet-body{max-height:70vh;overflow:auto;padding:18px 22px}
+    .close{background:#141826;border:1px solid #2a3558;color:#d8def4;border-radius:12px;padding:10px 12px;cursor:pointer}
+    .pill{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;background:#0f1320;border:1px solid #232a46;color:#c6ccea;font-size:12px;margin-right:8px}
+    .sec{margin:16px 0}
+    .sec h4{margin:0 0 8px 0;font-size:15px;color:#e7ebff}
+    .sec ul{margin:6px 0 0 18px;line-height:1.5}
+
+    .footer{margin-top:28px;color:#9aa3c7;font-size:12px;text-align:center;opacity:.8}
+    .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; background:#12182a;border:1px solid #233161;border-radius:6px;padding:2px 6px;color:#cfe1ff}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>보드게임카페 • 규칙 모음</h1>
+          <div style="color:var(--muted);font-size:13px">달무티 · 범인은 춤춘다 · 카멜레온 · 스파이폴 · 쿠키런 러브레터</div>
+        </div>
+      </div>
+      <div class="toolbar">
+        <select id="filterPlayers" class="select" title="인원수 필터">
+          <option value="">전체 인원</option>
+          <option value="2">2인 가능</option>
+          <option value="3-4">3–4인</option>
+          <option value="5-6">5–6인</option>
+          <option value="7-8">7–8인</option>
+        </select>
+        <button class="btn" id="resetBtn">초기화</button>
+      </div>
+    </header>
+
+    <section class="grid" id="grid"></section>
+
+    <div class="footer">
+      ⓒ 보드게임카페 룰북 컬렉션 · 이 페이지는 정리본이며, 세부 규칙은 각 제품의 공식 규칙서를 우선합니다.
+      <br />
+      단축키: <span class="kbd">ESC</span> 닫기
+    </div>
+  </div>
+
+  <dialog id="sheet">
+    <div class="sheet-head">
+      <div>
+        <div class="pill" id="sheetMeta"></div>
+        <h3 id="sheetTitle" style="margin:6px 0 0 0"></h3>
+        <div id="sheetSub" style="color:#aab2d6;font-size:13px"></div>
+      </div>
+      <button class="close" onclick="closeSheet()">닫기 (ESC)</button>
+    </div>
+    <div class="sheet-body" id="sheetBody"></div>
+  </dialog>
+
+<script>
+const GAMES = [
+  { id:'dalmuti', icon:'🎴', name:'달무티', eng:'The Great Dalmuti',
+    summary:'계급이 있는 롤플레이식 카드게임. 같은 장수의 더 낮은 숫자를 내며 손패를 먼저 비우자!',
+    players:'4–8명', time:'30–45분', age:'8+',
+    sections:[
+      {title:'한줄소개', body:`계급이 있는 롤플레이식 카드게임. 차례대로 같은 장수의 더 ‘낮은 숫자’를 내며 손패를 먼저 비우는 사람이 승리합니다!`},
+      {title:'목표', body:`순서대로 진행되는 각 턴에서 자신의 손패를 누구보다 빨리 비워 승리하세요!`},
+      {title:'구성품', list:[ '전용 덱 80장: 숫자 1~12 (각 숫자 값만큼 장수 존재 — 1은 1장, 12는 12장)', '어릿광대(조커) 2장' ]},
+      {title:'인원 / 시간 / 연령', list:[ '인원: 4–8명', '시간: 30–45분', '권장 연령: 8세 이상' ]},
+      {title:'준비(세팅)', list:[ '선(先)을 정하기 위해 카드를 엎은 채로 흩어 놓고 한 장씩 뽑는다.', '가장 작은 수를 뽑은 사람이 왕(달무티), 가장 큰 수는 농노. 같은 수면 재추첨.', '뽑은 카드는 덱으로 돌려놓고, 왕은 고정. 나머지는 계급순으로 시계방향 착석 (왕 오른쪽에 농노).', '모든 카드를 섞어 인원수에 맞춰 균등 배분.', '각 계급은 자신보다 낮은 계급에게 무엇이든 시킬 수 있음 (규칙 강제 제외, 거부권 없음).' ]},
+      {title:'세금징수', list:[ '왕↔농노 / 귀족↔하층민 카드 거래.', '농노→왕: 가장 낮은 카드 2장 / 왕→농노: 임의의 2장', '귀족↔하층민: 동일 방식(각 1장)' ]},
+      {title:'게임진행', list:[ '게임은 라운드 단위. 각 라운드 종료 시 세금징수.', '첫 라운드는 왕부터 시작, 시계방향.', '리드가 숫자카드 N장 묶음으로 시작.', '다음 플레이어는 같은 장수(N)로 더 낮은 숫자 묶음을 내거나 패스.', '모두 패스해 마지막 낸 사람에게 돌아오면 라운드 종료. 그 사람이 다음 라운드 선.', '손패를 모두 소진한 순서대로 등수(계급) 결정.', '세금 거래 대상자 중 한 명이 먼저 패를 소진하면 해당 세금은 생략.' ]},
+      {title:'조커', list:[ '단독 사용 시 숫자 13으로 취급', '다른 카드와 함께 사용 시 그 카드 숫자 복제(장수 증가)', '조커 2장 보유 시 혁명 가능' ]},
+      {title:'혁명', list:[ '농노가 조커 2장으로 혁명 시 즉시 모든 계급 역전', '다른 계급이 혁명 시 해당 라운드의 계급 개념 삭제, 세금징수 없음', '혁명 발동은 소유자 선택' ]}
+    ]},
+  { id:'culprit', icon:'🕵️‍♂️', name:'범인은 춤춘다', eng:'The Culprit Dances', summary:'속고 속이는 심리 카드게임! 범인을 색출하거나, 범인이라면 들키지 말자.', players:'3–8명', time:'15–20분', age:'10+',
+    sections:[ {title:'한줄소개', body:'서로 속고 속이는 심리 카드게임! ‘범인’ 카드를 숨기고 탐정에게 들키지 않으면 승리, 반대로 범인을 잡아내면 정의의 승리!'}, {title:'목표', body:'라운드 동안 ‘범인’을 찾아내거나, 범인이라면 들키지 않고 살아남기.'}, {title:'구성품', list:[ '카드 총 32장 (인원에 따라 조정)', '주요 카드 예시: 범인 / 탐정 / 개 / 소문 / 목격자 / 교환 / 함정 / 알리바이 / 최초발견자 등' ]}, {title:'인원 / 시간 / 연령', list:['인원: 3–8명','시간: 15–20분','권장 연령: 10세 이상']}, {title:'준비(세팅)', list:[ '인원에 따라 사용할 카드 세트를 정한다(공식 매뉴얼 기준).', '모든 카드 섞어 각자 4장씩 배분.', '‘최초발견자’ 카드가 있다면 그 사람이 첫 플레이어.' ]}, {title:'게임진행', list:[ '시계방향으로 각자 차례에 카드 1장 사용 → 효과 즉시 수행.', '버린 카드는 중앙 버림 더미에 공개.', '특정 조건 충족 시 라운드 즉시 종료.' ]}, {title:'종료 / 승리 조건', list:[ '라운드 종료: (1) ‘범인’ 카드가 플레이되어 공개됨, (2) 탐정/개 효과로 범인 적발.', '승리: 범인이 잡히면 적발 측 승리. 끝까지 안 잡히면 범인 승리.' ]} ]},
+  { id:'chameleon', icon:'🦎', name:'카멜레온', eng:'The Chameleon', summary:'모두가 아는 단어를 카멜레온 한 명만 모른다. 단서로 속이고 추리로 색출!', players:'3–8명', time:'~15분', age:'10+',
+    sections:[ {title:'한줄소개', body:'모두가 알고 있는 비밀 단어를 카멜레온 한 명만 모른다! 정체를 숨긴 채 단서를 던지고, 추리로 카멜레온을 색출하라.'}, {title:'목표', body:'카멜레온을 찾아내거나, 카멜레온이라면 들키지 않고 비밀 단어를 맞히기.'}, {title:'구성품', list:[ '주제 카드', '코드 카드', '카멜레온 카드', '주사위 2개(d6, d8)', '참조 시트' ]}, {title:'인원 / 시간 / 연령', list:['인원: 3–8명','시간: 15분 내외','권장 연령: 10세 이상']}, {title:'준비(세팅)', list:[ '주제 카드 1장을 중앙에 펼친다.', '각자 코드 카드를 받고, 한 명은 카멜레온 카드를 받는다.', '주사위를 굴려 좌표로 비밀 단어를 정한다(카멜레온만 모름).' ]}, {title:'게임진행', list:[ '모두가 순서대로 비밀 단어와 연관된 단어 1개씩 발언(직설 금지).', '자유 토론 후 모두가 동시에 한 사람 지목(카멜레온 색출 시도).' ]}, {title:'종료 / 승리 조건', list:[ '카멜레온이 지목되면: 카멜레온이 단어를 맞히면 카멜레온 승, 틀리면 나머지 승.', '카멜레온 지목 실패: 카멜레온 즉시 승리.' ]} ]},
+  { id:'spyfall', icon:'🕶️', name:'스파이폴', eng:'Spyfall', summary:'한 명의 스파이만 장소를 모른다. 질문으로 추리하고 색출하라!', players:'3–8명', time:'10–15분', age:'10+',
+    sections:[ {title:'한줄소개', body:'모두가 같은 장소에 있지만 단 한 명의 스파이만 장소를 모른다! 질문과 대화로 스파이를 색출하거나, 스파이는 들키지 않고 장소를 맞혀라.'}, {title:'목표', body:'스파이를 색출하거나, 스파이라면 정체를 숨긴 채 비밀 장소를 알아내기.'}, {title:'구성품', list:[ '장소 카드 세트(같은 장소 7장 + 스파이 1장)', '장소 목록 시트', '타이머' ]}, {title:'인원 / 시간 / 연령', list:['인원: 3–8명','시간: 약 10–15분','권장 연령: 10세 이상']}, {title:'준비(세팅)', list:[ '한 장소 세트를 섞어 모두에게 1장씩 배분(한 명은 스파이).', '각자 카드만 확인, 장소 목록 시트를 중앙에 둔다. 타이머 8분 설정.' ]}, {title:'게임진행', list:[ '임의의 플레이어가 누군가에게 질문 → 답변자는 다시 다른 사람에게 질문.', '대화 중 누구든 검거 투표를 제안할 수 있고, 스파이는 장소 추리를 선언할 수 있다.' ]}, {title:'종료 / 승리 조건', list:[ '검거 성공 시: 스파이가 장소 맞히면 스파이 승, 틀리면 시민 승.', '스파이의 장소 추리 선언: 맞히면 스파이 승, 틀리면 시민 승.', '시간 종료까지 검거 실패 시 스파이 승.' ]} ]},
+  { id:'cookierun-loveletter', icon:'🍪', name:'쿠키런 러브레터', eng:'Cookie Run: Love Letter', summary:'단 1장으로 승부하는 심리전. 끝까지 남거나 높은 숫자를 쥐면 승리!', players:'2–4명', time:'10–20분', age:'10+',
+    sections:[ {title:'한줄소개', body:'단 1장의 카드로 운명을 건 심리전! 상대의 카드를 추리하고, 끝까지 살아남아 가장 높은 수의 카드를 쥐고 있으면 승리.'}, {title:'목표', body:'라운드 종료 때까지 탈락하지 않거나, 종료 시 손의 숫자가 가장 높은 사람이 승리.'}, {title:'구성품', list:[ '카드 16장(쿠키런 테마, 기본 러브레터 구성과 동일)', '승점 토큰', '규칙서' ]}, {title:'인원 / 시간 / 연령', list:['인원: 2–4명','시간: 약 10–20분','권장 연령: 10세 이상']}, {title:'준비(세팅)', list:[ '모든 카드를 섞고 1장씩 배분.', '남은 카드에서 1장 비공개 제거(2인 규칙은 별도).', '임의의 플레이어부터 시계방향 진행.' ]}, {title:'게임진행', list:[ '자신의 차례에 카드 1장 뽑아 손에 2장 → 1장 플레이하고 효과 즉시 발동.', '효과 예: 카드 맞히기(맞히면 상대 탈락) / 비교해 낮은 쪽 탈락 / 보호 / 교환 / 보기 등.', '탈락한 플레이어는 해당 라운드에서 제외.' ]}, {title:'종료 / 승리 조건', list:[ '라운드 종료: 덱 소진 또는 한 명만 남을 때.', '승리: 한 명만 남았으면 그 사람, 모두 남았으면 손의 숫자 최댓값 보유자 승리.', '라운드 승자 승점 1개, 정해진 승점(예: 3점) 선취 시 최종 승리.' ]} ]}
+];
+
+const grid = document.getElementById('grid');
+const filterPlayers = document.getElementById('filterPlayers');
+const resetBtn = document.getElementById('resetBtn');
+const sheet = document.getElementById('sheet');
+const sheetBody = document.getElementById('sheetBody');
+
+function card(game){
+  const el = document.createElement('article');
+  el.className = 'card';
+  el.innerHTML = `
+    <span class="badge">${game.players} · ${game.time}</span>
+    <h3>${game.icon} ${game.name} <span style="color:#8fa3ff;font-weight:600;font-size:12px">${game.eng}</span></h3>
+    <div class="meta"> <span>인원 ${game.players}</span> <span>·</span> <span>시간 ${game.time}</span> <span>·</span> <span>연령 ${game.age}</span> </div>
+    <p>${game.summary}</p>
+    <div class="actions">
+      <button class="btn" onclick="openSheet('${game.id}')">자세히 보기</button>
+      <button class="btn ghost" onclick="copyLink('${game.id}')">링크 복사</button>
+    </div>`;
+  return el;
+}
+
+function render(){
+  grid.innerHTML='';
+  const bucket = filterPlayers.value;
+
+  function rangeFromPlayers(str){
+    const nums = (str.match(/\d+/g)||[]).map(n=>parseInt(n,10));
+    if(nums.length>=2) return {min:nums[0], max:nums[1]};
+    if(nums.length===1) return {min:nums[0], max:nums[0]};
+    return {min:1, max:99};
+  }
+  function overlap(r, a, b){ return !(r.max < a || r.min > b); }
+
+  const list = GAMES.filter(g=>{
+    const r = rangeFromPlayers(g.players);
+    if(!bucket) return true;
+    if(bucket==='2')   return r.min <= 2;     // 2인 가능
+    if(bucket==='3-4') return overlap(r,3,4);
+    if(bucket==='5-6') return overlap(r,5,6);
+    if(bucket==='7-8') return overlap(r,7,8);
+    return true;
+  });
+
+  list.forEach(g=> grid.appendChild(card(g)));
+}
+
+function openSheet(id){
+  const g = GAMES.find(x=>x.id===id);
+  if(!g) return;
+  document.getElementById('sheetTitle').textContent = `${g.icon} ${g.name}`;
+  document.getElementById('sheetSub').textContent = g.eng;
+  document.getElementById('sheetMeta').textContent = `${g.players} · ${g.time} · ${g.age}`;
+  sheetBody.innerHTML = g.sections.map(sec=>{
+    const items = sec.list ? `<ul>${sec.list.map(li=>`<li>${li}</li>`).join('')}</ul>` : `<p style="color:#cfd5ea;line-height:1.6;margin:0">${sec.body}</p>`;
+    return `<div class="sec"><h4>• ${sec.title}</h4>${items}</div>`
+  }).join('');
+  sheet.showModal();
+}
+function closeSheet(){ sheet.close(); }
+
+function copyLink(id){
+  const url = new URL(window.location);
+  url.hash = id;
+  navigator.clipboard.writeText(url.toString()).then(()=>{
+    const prev = document.title; document.title = '✔ 링크가 복사되었습니다';
+    setTimeout(()=>document.title=prev, 800);
+  });
+}
+
+filterPlayers.addEventListener('change', render);
+resetBtn.addEventListener('click', ()=>{ filterPlayers.value=''; render(); });
+
+// 단축키: ESC 로 닫기
+window.addEventListener('keydown', e=>{
+  if(e.key === 'Escape' && sheet.open){ closeSheet(); }
+});
+
+window.addEventListener('load', ()=>{
+  render();
+  const id = location.hash.replace('#','');
+  if(id) setTimeout(()=>openSheet(id), 120);
+});
+</script>
+</body>
+</html>
