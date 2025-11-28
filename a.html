@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>보드게임카페 • 규칙 모음</title>
+  <meta name="description" content="달무티, 범인은 춤춘다, 카멜레온, 스파이폴, 쿠키런 러브레터 규칙 모음" />
+  <style>
+    :root{
+      --bg:#0b0c10; --card:#111218; --muted:#8b8fa3; --text:#eef0f7; --brand:#7c9cff; --accent:#9ef0c3;
+      --ring:0 0 0 3px rgba(124,156,255,.35);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Pretendard,Apple SD Gothic Neo,Noto Sans KR,Helvetica,Arial;
+      background:linear-gradient(180deg,#0b0c10 0%,#0e1018 60%,#0b0c10 100%);
+      color:var(--text)
+    }
+    a{color:inherit}
+    .container{max-width:1100px;margin:0 auto;padding:24px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--brand),var(--accent));box-shadow:0 10px 30px rgba(124,156,255,.35)}
+    h1{font-size:22px;margin:0}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap}
+    .select{appearance:none;background:var(--card);border:1px solid #1c2030;color:var(--text);padding:12px 38px 12px 14px;border-radius:12px;position:relative}
+    .btn{background:var(--brand);color:#0b0c10;border:none;padding:12px 16px;border-radius:12px;font-weight:700;cursor:pointer}
+    .btn:focus{box-shadow:var(--ring)}
+
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+    .card{grid-column:span 12;background:linear-gradient(180deg,#111218,#0e1118);border:1px solid #1c2030;border-radius:18px;padding:16px;position:relative;overflow:hidden}
+    @media(min-width:700px){.card{grid-column:span 6}}
+    @media(min-width:1000px){.card{grid-column:span 4}}
+    .card:hover{transform:translateY(-2px);transition:transform .2s ease}
+    .badge{position:absolute;top:12px;right:12px;background:#0f1320;border:1px solid #232a46;color:var(--muted);padding:6px 10px;border-radius:999px;font-size:12px}
+    .card h3{margin:8px 0 4px;font-size:18px}
+    .meta{display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:13px}
+    .card p{color:#cfd5ea;font-size:14px;line-height:1.4}
+    .actions{margin-top:10px;display:flex;gap:10px}
+    .ghost{background:#111826;border:1px solid #25304d;color:#d8def4}
+
+    /* Modal */
+    dialog{width:min(860px,92vw);border:none;border-radius:18px;background:#0e1118;color:var(--text);padding:0;box-shadow:0 25px 80px rgba(0,0,0,.6)}
+    .sheet-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid #1c2030}
+    .sheet-body{overflow:hidden;position:relative;}
+    .close{background:#141826;border:1px solid #2a3558;color:#d8def4;border-radius:12px;padding:10px 12px;cursor:pointer}
+    .pill{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;background:#0f1320;border:1px solid #232a46;color:#c6ccea;font-size:12px;margin-right:8px}
+
+    /* Modal Carousel */
+    .carousel{position:relative;width:100%;height:60vh;overflow:hidden;}
+    .slides{display:flex;transition:transform .5s ease;}
+    .slide{min-width:100%;padding:24px;box-sizing:border-box;overflow-y:auto;}
+    .slide h4{margin:0 0 10px;font-size:18px;color:#9ef0c3}
+    .slide ul{margin-left:20px;line-height:1.5;color:#cfd5ea}
+    .slide p{color:#cfd5ea;line-height:1.6}
+    .controls{position:absolute;top:50%;width:100%;display:flex;justify-content:space-between;transform:translateY(-50%);}
+    .ctrl{background:rgba(0,0,0,.4);border:none;color:#fff;font-size:26px;padding:6px 14px;border-radius:8px;cursor:pointer}
+    .dots{display:flex;justify-content:center;gap:6px;padding:12px 0;}
+    .dot{width:10px;height:10px;border-radius:50%;background:#444;cursor:pointer}
+    .dot.active{background:#7c9cff}
+    .slide h4 {
+    text-align: left;
+    }
+
+    .slide p {
+      text-align: center;
+    }
+
+    .slide img {
+      max-width: 100%;
+      max-height: 38vh;
+      object-fit: contain;
+      border: 1px solid #1c2030;
+      border-radius: 12px;
+      display: block;
+      margin: 0 auto; /* 가운데 정렬 */
+    }
+
+    /* 리스트는 그대로 왼쪽 */
+    .slide ul {
+      text-align: left;
+    }
+    .footer{margin-top:28px;color:#9aa3c7;font-size:12px;text-align:center;opacity:.8}
+    .kbd{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; background:#12182a;border:1px solid #233161;border-radius:6px;padding:2px 6px;color:#cfe1ff}
+    .slide img {
+      max-width: 100%;
+      max-height: 38vh; /* 모달 높이의 대략 절반 정도만 쓰게 */
+      object-fit: contain;
+      border: 1px solid #1c2030;
+      border-radius: 12px;
+      display: block;
+    }
+
+    /* ===== 모바일 전용 개선 ===== */
+    @media (max-width: 720px) {
+
+      .container {
+        padding: 16px 14px 70px;
+      }
+
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .toolbar {
+        width: 100%;
+        display: flex;
+        gap: 10px;
+      }
+
+      .select {
+        flex: 1;
+        width: 100%;
+      }
+
+      .btn {
+        padding: 11px 14px;
+        font-size: 14px;
+      }
+
+      .card {
+        padding: 14px 14px 12px;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+      .actions .btn,
+      .actions .ghost {
+        width: 100%;
+        text-align: center;
+      }
+
+      /* 모달을 모바일에선 풀스크린처럼 */
+      dialog {
+        width: 100vw;
+        height: 100vh;
+        max-width: none;
+        max-height: none;
+        margin: 0;
+        border-radius: 0;
+      }
+
+      .sheet-head {
+        padding: 16px 14px 12px;
+      }
+
+      .close {
+        padding: 8px 10px;
+        font-size: 13px;
+      }
+
+      .carousel {
+        height: calc(100vh - 110px);
+      }
+
+      .slide {
+        padding: 16px 14px 80px;
+      }
+
+      /* 컨트롤을 아래로 */
+      .controls {
+        top: auto;
+        bottom: 16px;
+        justify-content: center;
+        gap: 16px;
+        transform: none;
+      }
+      .ctrl {
+        font-size: 22px;
+        padding: 6px 14px;
+      }
+
+      .dots {
+        position: absolute;
+        bottom: 56px;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>보드게임카페 • 규칙 모음</h1>
+          <div style="color:var(--muted);font-size:13px">달무티 · 범인은 춤춘다 · 카멜레온 · 스파이폴 · 쿠키런 러브레터</div>
+        </div>
+      </div>
+      <div class="toolbar">
+        <select id="filterPlayers" class="select" title="인원수 필터">
+          <option value="">전체 인원</option>
+          <option value="2">2인 가능</option>
+          <option value="3-4">3–4인</option>
+          <option value="5-6">5–6인</option>
+          <option value="7-8">7–8인</option>
+        </select>
+        <button class="btn" id="resetBtn">초기화</button>
+      </div>
+    </header>
+
+    <section class="grid" id="grid"></section>
+
+    <div class="footer">
+      ⓒ 보드게임카페 룰북 컬렉션 · 이 페이지는 정리본이며, 세부 규칙은 각 제품의 공식 규칙서를 우선합니다.
+      <br />
+      단축키: <span class="kbd">ESC</span> 닫기
+    </div>
+  </div>
+
+  <!-- 상세 모달 (Carousel) -->
+  <dialog id="sheet">
+    <div class="sheet-head">
+      <div>
+        <div class="pill" id="sheetMeta"></div>
+        <h3 id="sheetTitle" style="margin:6px 0 0 0"></h3>
+        <div id="sheetSub" style="color:#aab2d6;font-size:13px"></div>
+      </div>
+      <button class="close" onclick="closeSheet()">닫기 (ESC)</button>
+    </div>
+    <div class="sheet-body">
+      <div class="carousel">
+        <div class="slides" id="slides"></div>
+        <div class="controls">
+          <button class="ctrl" id="prev">‹</button>
+          <button class="ctrl" id="next">›</button>
+        </div>
+        <div class="dots" id="dots"></div>
+      </div>
+    </div>
+  </dialog>
+
+<script>
+// --- 데이터: 5개 게임 (섹션 → Carousel 슬라이드) ---
+const GAMES = [
+  {
+    id:'dalmuti', icon:'🫅', name:'달무티', 
+    summary:'계급이 있는 롤플레이식 카드게임. 같은 장수의 더 낮은 숫자를 내며 손패를 먼저 비우자!',
+    players:'4–8명', time:'30–45분', age:'8+',
+    sections:[
+      {title:'한줄소개', body:`계급이 있는 롤플레이식 카드게임. 차례대로 같은 장수의 더 ‘낮은 숫자’를 내며 손패를 먼저 비우는 사람이 승리합니다!`},
+      {title:'목표', body:`순서대로 진행되는 각 턴에서 자신의 손패를 누구보다 빨리 비워 승리하세요!`},
+      {title:'구성품', img:"d_7.png", list:[
+        '전용 덱 80장: 숫자 1~12 (각 숫자 값만큼 장수 존재 -> 1은 1장, 12는 12장)',
+        '어릿광대(조커) 2장'
+      ]},
+      {title:'인원 / 시간 / 연령', list:[
+        '인원: 4–8명', '시간: 30–45분', '권장 연령: 8세 이상'
+      ]},
+      {title:'준비(세팅)', img:"d_1.jpg", list:[
+        '선(先)을 정하기 위해 카드를 엎은 채로 흩어 놓고 한 장씩 뽑는다.  ',
+        '가장 작은 수를 뽑은 사람이 왕(달무티), 가장 큰 수는 농노. 같은 수면 재추첨.',
+        '뽑은 카드는 덱으로 돌려놓고, 왕은 고정. 나머지는 계급순으로 시계방향 착석 (왕 오른쪽에 농노).',
+        '모든 카드를 섞어 인원수에 맞춰 균등 배분.',
+        '각 계급은 자신보다 낮은 계급에게 왕게임과 같이 시킬 수 있음 (규칙 강제 제외, 거부권 없음).'
+      ]},
+      {title:'세금징수', img:"d_group.png", list:[
+        '왕↔농노 / 귀족↔하층민 카드(세금) 거래.',
+        '농노→왕: 가장 낮은 카드 2장 / 왕→농노: 임의의 2장',
+        '귀족↔하층민: 동일 방식(각 1장)',
+        '나머지 중간 인원은 해당사항 없음.',
+        '세금 거래 대상자 중 한 명이 먼저 패를 소진하면 해당 세금은 생략.'        
+      ]},
+      {title:'게임진행', img:"d_1.jpg", list:[
+        '게임은 라운드 단위. 각 라운드 종료 시 세금징수.',
+        '첫 라운드는 왕부터 시작, 시계방향.'
+      ]},
+      {title:'게임진행', img:"d_2.jpg", list:[
+        '첫번째 순서(첫 라운드는 왕부터 시작)가 숫자카드 N장 묶음을 자신의 앞에 냄 (N은 1 이상).',
+        '다음 플레이어는 같은 장수(N)로 더 낮은 숫자 묶음을 내거나 패스.'
+      ]},      
+      {title:'게임진행', img:"d_3.jpg", list:[
+        '모두 패스해 마지막 낸 사람에게 돌아오면 라운드 종료. 그 사람이 다음 라운드 선.',
+        '손패를 모두 소진한 순서대로 등수(계급) 결정.',
+      ]},      
+      {title:'게임진행', img:"d_4.jpg", list:[
+        '다음 플레이어는 같은 장수(N)로 더 낮은 숫자 묶음을 내야함',
+        '만약 카드를 내고싶지 않거나 없을 시 패스 가능.',
+        '모두 패스해 마지막 낸 사람에게 돌아오면 라운드 종료.',
+        '모두를 패스하게 만든 패를 낸 사람이 다음 라운드 선.'
+      ]},
+      {title:'게임진행', img:"d_5.jpg", list:[
+        '손패를 모두 소진한 순서대로 등수(계급) 결정.',
+        '가장 먼저 소진한 사람이 1등(다음 라운드의 왕) , 그 다음이 2등(귀족) ... 마지막이 농노.',
+      ]},
+      {title:'조커', img:"d_6.jpg", list:[
+        '단독 사용 시 숫자 13으로 취급',
+        '다른 카드와 함께 사용 시 그 카드 숫자 복제(장수 증가)',
+        '조커 2장 보유 시 혁명 가능'
+      ]},
+      {title:'혁명', list:[
+        '농노가 조커 2장으로 혁명 시 즉시 모든 계급 역전',
+        '다른 계급이 혁명 시 해당 라운드의 계급 개념 삭제, 세금징수 없음',
+        '혁명 발동은 소유자 선택'
+      ]}
+    ]
+  },
+  {
+    id:'culprit', icon:'🕵️‍♂️', name:'범인은 춤춘다', 
+    summary:'속고 속이는 심리 카드게임! 범인을 색출하거나, 범인이라면 들키지 말자.',
+    players:'3–9명', time:'15–20분', age:'10+',
+    sections:[
+      {title:'한줄소개', body:'서로 속고 속이는 심리 카드게임! ‘범인’ 카드를 숨기고 탐정에게 들키지 않으면 승리, 반대로 범인을 잡아내면 정의의 승리!'},
+      {title:'목표', body:'라운드 동안 ‘범인’을 찾아내거나, 범인이라면 들키지 않고 살아남기.'},
+      {title:'구성품', list:[
+        '카드 총 32장 (인원에 따라 조정)',
+        '주요 카드 예시: 범인 / 탐정 / 강아지 / 소문 / 목격자 / 교환 / 정보공유 / 알리바이 / 최초발견자 등'
+      ]},
+      {title:'인원 / 시간 / 연령', list:['인원: 3–9명','시간: 15–20분','권장 연령: 10세 이상']},
+      {title:'준비(세팅)', img:"b_player.png",list:[
+        '인원에 따라 사용할 카드 세트를 정한다(공식 매뉴얼 기준).'
+      ]},
+      {title:'준비(세팅)', img:"b_1.jpg",list:[
+        '모든 카드 섞어 각자 4장씩 배분.',
+      ]},
+      {title:'준비(세팅)', img:"first.png",list:[
+        '‘최초발견자’ 카드가 있다면 그 사람이 첫 플레이어.'
+      ]},
+      {title:'게임진행', img:"b_2.jpg", list:[
+        '최초발견자를 낸 사람을 시작으로 시계방향 진행.',
+        '(최초발견자를 낸 행위도 사용으로 간주하여 다음사람 에게 턴이 넘어감)'
+      ]},
+      {title:'게임진행', img:"b_3.jpg", list:[
+        '시계방향으로 각자 차례에 카드 1장 사용 → 효과 즉시 수행.'
+      ]},
+      {title:'게임진행', img:"b_4.jpg", list:[
+        '공범 / 시민 / 직원 카드의 경우 사용 시 자신의 앞쪽에 공개하여 놓음.',
+        '(현재 자신이 공범인지 시민인지 알리기 위함)'
+      ]},
+      {title:'게임진행', img:"b_5.jpg", list:[
+        '탐정카드를 사용하여 범인을 특정할 수 있음.',
+        '탐정카드 사용 시 특정 플레이어 1명 지목'
+      ]},
+      {title:'게임진행', img:"b_6.jpg", list:[
+        '지목당한 플레이어가 ‘범인’ 카드 소지 시 즉시 공개되어 적발됨.(시민팀 승리)',
+        '지목당한 플레이어가 ‘범인’카드가 없거나 범인과 알리바이를 같이 소지하고있다면 아무 일도 일어나지 않음.'
+      ]},
+      {title:'종료 / 승리 조건', list:[
+        '1) 범인의 승리 : 마지막 카드로 범인을 낼 시',
+        '2) 시민팀의 승리 : 탐정카드로 범인을 적발 시',
+        '3) 범인과 공범의 승리 : 공범을 낸 사람이 존재하며, 그 동시에 범인이 승리할 시',
+        '4) 강아지의 승리 : 강아지 카드로 범인을 적발 시'
+      ]}
+    ]
+  },
+  {
+    id:'spyfall', icon:'🕶️', name:'스파이폴', 
+    summary:'한 명의 스파이만 장소를 모른다. 질문으로 추리하고 색출하라!',
+    players:'3–12명', time:'10–15분', age:'10+',
+    sections:[
+      {title:'한줄소개', body:'모두가 같은 장소에 있지만 단 한 명의 스파이만 장소를 모른다!\n질문과 대화로 스파이를 색출하거나, 스파이는 들키지 않고 장소를 맞혀라.'},
+      {title:'목표', body:'스파이를 색출하거나, 스파이라면 정체를 숨긴 채 비밀 장소를 알아내기.'},
+      {title:'구성품', img:"spyfall.png", list:[
+        '장소 카드 세트 20묶음 (같은 장소 10장 + 스파이 2장)',
+        '장소 목록 시트(설명문내 위치)'
+      ]},
+      {title:'인원 / 시간 / 연령', list:['인원: 3–8명','시간: 약 10–15분','권장 연령: 10세 이상']},
+      {title:'준비(세팅)', img:"spy.png", list:[
+        '스파이의 수를 결정한다',
+        '-플레이어가 6명 이하일 경우 1명',
+        '-플레이어가 7명 이상일 경우 2명'
+      ]},
+      {title:'준비(세팅)', img:"s_1.jpg", list:[
+        '상자속에 무작위로 섞인 지퍼팩 묶음 중 하나를 골라 장소를 결정합니다.',
+        '결정한 묶음은 가장 아래 카드의 앞면이 보이지 않도록 지퍼팩에서 꺼냅니다',
+        '카드는 12장이 한 묶음으로 구성되어 있습니다.',
+      ]},
+      {title:'준비(세팅)', img:"s_2.jpg", list:[
+        '카드팩을 윗면이 보인 상태라면 가장 아래 2장이 스파이 카드입니다.',
+        '스파이 카드를 2장 뺀 상태로 나머지 10장의 카드를 섞어 인원수-1 혹은 -2장(스파이카드) 만큼 가져옵니다',
+      ]},
+      {title:'준비(세팅)', img:"s_3.jpg", list:[
+        '스파이 카드를 2장 뺀 상태로 나머지 10장의 카드를 섞습니다.',
+        '섞은 카드를 인원수-1 혹은 -2장(스파이카드) 만큼 가져옵니다',
+        '*위 사진은 참고용입니다 본 게임에서는 뒷면인 상태로 진행해주세요*'
+      ]},
+      {title:'준비(세팅)', img:"spyfall_map.png", list:[
+        '게임에 나오는 모든 장소가 보이도록 테이블 중앙에 펼처둡니다'
+      ]},
+      {title:'준비(세팅)', img:"s_5.jpg", list:[
+        '모든 장소가 보이도록 테이블 중앙에 펼처둔 상태로 준비해준 카드(스파이1~2장/장소카드)를 한장씩 나누어 받습니다.'
+      ]},
+      {title:'게임진행', list:[
+        '제한시간 10분 타이머를 맞춥니다.',
+        '임의의 플레이어가 누군가에게 질문 → 답변자는 다시 다른 사람(되질문 불가)에게 질문.',
+        '대화 중 누구든 검거 투표를 제안할 수 있고, 스파이는 장소 추리를 선언할 수 있다.'
+      ]},
+      {title:'예시 질문지', list:[
+        '장소가 계절/날씨의 영향을 받는가?',
+        '장소가 동물의 출입이 자유로운가?',
+        '당신은(직업상) 어떤 복장을 주로 입는가?',
+        '장소가 최대 수용인원의 범주가 어떻게 되는가?',
+        '장소에 오는 인원의 연령대는 어떻게 되는가?',
+        '당신은(직업상) 소비자인가 제공자인가?',
+        '당신이(직업상) 일하는 시간대는 언제인가?',
+        '이 장소는 외향/내향인에게 인기가 많은가?',
+        '이 장소에서 일하는 것 중 가장 힘든 점은 무엇인가?',
+        '이 장소에서 영화를 찍으면 어떤 장르가 어울리는가?'
+      ]},
+      {title:'종료 / 승리 조건', list:[
+        '검거 성공 시: 스파이가 장소 맞히면 스파이 승, 틀리면 시민 승.',
+        '스파이의 장소 추리 선언: 맞히면 스파이 승, 틀리면 시민 승.',
+        '시간 종료까지 검거 실패 시 스파이 승.'
+      ]}
+    ]
+  },
+  {
+    id:'smith-swiss',
+    icon:'⛰️',
+    name:'스위스 사는 스미스씨',
+    summary:'빨리 발음하기 어려운 단어 카드를 실수 없이 읽어내 점수를 경쟁하는 잔말놀이!',
+    players:'2–6명',
+    time:'15분',
+    age:'8+',
+    sections: [
+      {
+        title: '개요',
+        body: 'tongue-twister를 카드로 하는 게임입니다. 펼쳐진 단어 카드들을 실수 없이 빠르게 읽으면 되고, 실패하면 그 카드들을 벌점으로 가져옵니다.'
+      },
+      {
+        title: '구성품',
+        img: "g_1.jpg",
+        list: [
+          '단어 카드 90장',
+          '특수 카드 6장',
+          '*위 3개의 게임 모두 게임방식은 같지만 단어의 구성(혹은 언어)이 다릅니다*'
+        ]
+      },
+      {
+        title: '게임 준비',
+        list: [
+          '모든 단어/특수 카드를 잘 섞어 한 더미로 만듭니다.',
+          '가장 목소리가 좋은 사람이 시작 플레이어가 되고, 그 다음 플레이어가 시작 플레이어의 심판이 됩니다.'
+        ],
+        img: 'g_3.jpg' // 세팅 사진
+      },
+      {
+        title: '플레이 (자기 차례)',
+        list: [
+          '첫 시작은 더미에서 단어 카드가 나올 때까지 앞면으로 펼쳐 덱 옆에 놓습니다.\n(만약 특수 카드가 나오면 다시 섞어 넣기)',
+          '앞에 펼쳐진 단어 카드를 좌에서 우로 소리 내어 읽습니다.',
+          '단어가 2장 이상이면 더미의 화살표 방향 순서대로 읽습니다.',
+          '심판이 “실수 없음”으로 판단하면 성공, 조금이라도 틀리거나 1초 이상 끊기면 실패입니다.'
+        ],
+        img: 'g_2.jpg'
+      },
+      {
+        title: '플레이 (심판)',
+        list: [
+          '항상 카드를 읽어야하는 플레이어의 다음 순서는 그 플레이어의 심판이 됩니다.',
+          '플레이어가 단어를 읽는 동안 집중하여 듣고, 실수 여부를 판단합니다.',
+          '심판은 플레이어가 단어를 모두 읽은 후 통과와 실패를 선언합니다.',
+          '너무 빡빡하게 굴면 자신에게도 돌아올 수 있으니 주의하세요!'
+        ]
+      },
+      {
+        title: '성공했을 때',
+        list: [
+          '1) 새 카드 1장을 더미에서 가져와 가장 오른쪽에 새로 펼치거나,',
+          '2) 이미 펼쳐진 카드 위에 겹쳐 올려 스택을 높입니다.'
+        ],
+        img: 'g_5.jpg'
+      },
+      {
+        title: '실패했을 때',
+        list: [
+          '실패한 위치의 카드 더미(그 카드에 해당하는 스택)를 전부 자신 앞으로 가져와 뒷면으로 둡니다.',
+          '가져온 카드 1장당 벌점 1점입니다.',
+          '실패한 차례에는 새 카드를 펼치지 않습니다. 단, 앞면 카드가 하나도 없으면 1장은 다시 펼칩니다.'
+        ],
+        img: 'g_6.jpg'
+      },
+      {
+        title: '특수 카드',
+        list: [
+          '첫 글자 외치기: 적용된 단어의 첫 글자에 음 높낮이로 강조를 줘서 읽기',
+          '두 번 말하기: 적용된 단어는 이제 2번(여러 장이면 3번) 읽어야 함',
+          '방향 바꾸기: 게임의 순서가 반대 방향으로 바뀜',
+          '벌점 카드 반납: 자신이 가진 벌점 카드 1장을 덱으로 돌려보냅니다.'
+        ],
+        img: 'g_9.jpg'
+      },
+      {
+        title: '게임 종료 & 승리',
+        list: [
+          '누군가 앞에 놓인 카드가 6장 이상이 되면 게임 종료',
+          '가져간 카드가 가장 적은 사람이 승리',
+          '동점이면 벌점 많은 사람이 심판이 되어 마지막 대결을 진행해 최종 승자를 정합니다'
+        ],
+        img: 'g_10.jpg'        
+      }
+    ]
+  }
+];
+
+// --- 렌더링 ---
+const grid = document.getElementById('grid');
+const filterPlayers = document.getElementById('filterPlayers');
+const resetBtn = document.getElementById('resetBtn');
+const sheet = document.getElementById('sheet');
+const slidesEl = document.getElementById('slides');
+const dotsEl = document.getElementById('dots');
+const prev = document.getElementById('prev');
+const next = document.getElementById('next');
+let index = 0;
+
+function card(game){
+  const el = document.createElement('article');
+  el.className = 'card';
+  el.innerHTML = `
+    <span class="badge">${game.players} · ${game.time}</span>
+    <h3>${game.icon} ${game.name} <span style="color:#8fa3ff;font-weight:600;font-size:12px"></span></h3>
+    <div class="meta"> <span>인원 ${game.players}</span> <span>·</span> <span>시간 ${game.time}</span> <span>·</span> <span>연령 ${game.age}</span> </div>
+    <p>${game.summary}</p>
+    <div class="actions">
+      <button class="btn" onclick="openSheet('${game.id}')">자세히 보기</button>
+      <button class="btn ghost" onclick="copyLink('${game.id}')">링크 복사</button>
+    </div>`;
+  return el;
+}
+
+function rangeFromPlayers(str){
+  const nums = (str.match(/\d+/g)||[]).map(n=>parseInt(n,10));
+  if(nums.length>=2) return {min:nums[0], max:nums[1]};
+  if(nums.length===1) return {min:nums[0], max:nums[0]};
+  return {min:1, max:99};
+}
+function overlap(r, a, b){ return !(r.max < a || r.min > b); }
+
+function render(){
+  grid.innerHTML='';
+  const bucket = filterPlayers.value;
+
+  const list = GAMES.filter(g=>{
+    const r = rangeFromPlayers(g.players);
+    if(!bucket) return true;
+    if(bucket==='2')   return r.min <= 2;     // 2인 가능
+    if(bucket==='3-4') return overlap(r,3,4);
+    if(bucket==='5-6') return overlap(r,5,6);
+    if(bucket==='7-8') return overlap(r,7,8);
+    return true;
+  });
+
+  list.forEach(g=> grid.appendChild(card(g)));
+}
+
+function openSheet(id){
+  const g = GAMES.find(x=>x.id===id);
+  if(!g) return;
+  document.getElementById('sheetTitle').textContent = `${g.icon} ${g.name}`;
+  document.getElementById('sheetMeta').textContent = `${g.players} · ${g.time} · ${g.age}`;
+
+  slidesEl.innerHTML = g.sections.map(sec => {
+    const media = sec.img
+      ? `<div style="margin-bottom:14px;">
+          <img src="${sec.img}" alt="${sec.title}">
+        </div>`
+      : '';
+
+    // If body contains newlines, convert them to HTML <br> so they show
+    // as visible line breaks inside the paragraph. We still allow raw
+    // HTML (e.g. <br>) if provided in the data.
+    const body = sec.list
+      ? `<ul>${sec.list.map(li => `<li>${li}</li>`).join('')}</ul>`
+      : `<p>${(sec.body||'').replace(/\n/g, '<br>')}</p>`;
+    return `<div class="slide">
+      <h4>• ${sec.title}</h4>
+      ${media}
+      ${body}
+    </div>`;
+  }).join('');
+
+
+  dotsEl.innerHTML = '';
+  g.sections.forEach((_,i)=>{
+    const d = document.createElement('div');
+    d.className = 'dot';
+    d.addEventListener('click',()=>{ index = i; updateCarousel(); });
+    dotsEl.appendChild(d);
+  });
+
+  index = 0;
+  updateCarousel();
+  document.body.style.overflow = 'hidden';   // 모바일에서 뒷배경 스크롤 방지
+  sheet.showModal();
+}
+
+function closeSheet(){
+  sheet.close();
+  document.body.style.overflow = ''; // 원상복구
+}
+
+function updateCarousel(){
+  slidesEl.style.transform = `translateX(-${index*100}%)`;
+  document.querySelectorAll('.dot').forEach((d,i)=> d.classList.toggle('active', i===index));
+}
+
+function copyLink(id){
+  const url = new URL(window.location);
+  url.hash = id;
+  navigator.clipboard.writeText(url.toString()).then(()=>{
+    const prevTitle = document.title; document.title = '✔ 링크가 복사되었습니다';
+    setTimeout(()=>document.title=prevTitle, 800);
+  });
+}
+
+filterPlayers.addEventListener('change', render);
+resetBtn.addEventListener('click', ()=>{ filterPlayers.value=''; render(); });
+
+// Carousel prev/next 버튼 작동
+prev.addEventListener('click', ()=>{
+  const total = slidesEl.children.length || 0;
+  if(!total) return;
+  index = (index - 1 + total) % total;
+  updateCarousel();
+});
+next.addEventListener('click', ()=>{
+  const total = slidesEl.children.length || 0;
+  if(!total) return;
+  index = (index + 1) % total;
+  updateCarousel();
+});
+
+// 단축키: ESC 로 닫기
+window.addEventListener('keydown', e=>{
+  if(e.key === 'Escape' && sheet.open){
+    closeSheet();
+  }
+});
+
+// 해시로 직접 열기
+window.addEventListener('load', ()=>{
+  render();
+  const id = location.hash.replace('#','');
+  if(id) setTimeout(()=>openSheet(id), 120);
+});
+</script>
+</body>
+</html>
